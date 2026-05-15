@@ -1,0 +1,117 @@
+# `parseh-fuzz` — V0.2.5 cargo-fuzz harness for PARSEH wire format
+# deserialisation.
+#
+# This crate is intentionally OUTSIDE the `server/` workspace (see the
+# `exclude` line in `server/Cargo.toml`). cargo-fuzz convention: the
+# fuzz target binaries get built with `-Z sanitizer=address` and a
+# libfuzzer runtime, which we do not want infecting the production
+# workspace's lockfile or feature unification.
+#
+# The seven targets cover every byte sequence that crosses the
+# `untrusted-network → trusted-process` boundary at V0.2.5:
+#
+#   - JobSpec / JobResult / JobVerification / JobOutcome           (parseh-task)
+#   - CapabilityAdvertisement                                       (parseh-core)
+#   - StateDelta                                                    (parseh-shared-state)
+#   - ed25519 verify of an attacker-shaped (key, msg, sig) triple   (parseh-task)
+#
+# Cultural rule: fuzz findings are release-blocking. See
+# the project notes and
+# the project notes.
+
+[package]
+name        = "parseh-fuzz"
+version     = "0.0.0"
+edition     = "2021"
+license     = "Apache-2.0"
+publish     = false
+description = "V0.2.5 cargo-fuzz harness for PARSEH wire format deserialisation."
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys       = "0.4"
+ciborium            = "0.2"
+ed25519-dalek       = { version = "2.1", features = ["rand_core"] }
+# Pulled in by the seed-corpus generator only — the fuzz targets
+# themselves go through the parseh-* crates' re-exports. We list these
+# directly because cargo-fuzz crates do not inherit workspace deps.
+libp2p              = { version = "0.53", features = ["serde"] }
+serde               = { version = "1.0", features = ["derive"] }
+parseh-task         = { path = "../parseh-task" }
+parseh-verify       = { path = "../parseh-verify" }
+parseh-shared-state = { path = "../parseh-shared-state" }
+parseh-core         = { path = "../core" }
+
+# The fuzz binaries are libFuzzer entry points: no `main`, `#![no_main]`,
+# `fuzz_target!` macro. Suppressing `test`/`doc`/`bench` keeps `cargo
+# check --bins` honest about what we actually build.
+
+[[bin]]
+name  = "fuzz_job_spec"
+path  = "fuzz_targets/fuzz_job_spec.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "fuzz_job_result"
+path  = "fuzz_targets/fuzz_job_result.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "fuzz_job_verification"
+path  = "fuzz_targets/fuzz_job_verification.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "fuzz_job_outcome"
+path  = "fuzz_targets/fuzz_job_outcome.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "fuzz_capability_advertisement"
+path  = "fuzz_targets/fuzz_capability_advertisement.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "fuzz_state_delta"
+path  = "fuzz_targets/fuzz_state_delta.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "fuzz_signature_verify"
+path  = "fuzz_targets/fuzz_signature_verify.rs"
+test  = false
+doc   = false
+bench = false
+
+# Seed-corpus generator. Standalone binary (not a fuzz target) we
+# commit so a reviewer can regenerate the seed corpus byte-for-byte.
+# Lives under `gen/` so cargo-fuzz does NOT try to compile it as a
+# libFuzzer target.
+[[bin]]
+name  = "gen_corpus"
+path  = "gen/gen_corpus.rs"
+test  = false
+doc   = false
+bench = false
+
+# Release-profile tuning per cargo-fuzz docs. Sanitizer flags come from
+# `cargo fuzz run` via `RUSTFLAGS`; we only set what is safe to set
+# unconditionally.
+[profile.release]
+debug          = 1
+opt-level      = 3
+codegen-units  = 1

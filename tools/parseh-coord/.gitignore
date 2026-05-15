@@ -1,0 +1,7 @@
+/target
+Cargo.lock.bak
+# Local operator state + credentials live in ~/.parseh/ (outside the repo),
+# never here. Belt-and-braces in case anyone runs with --db inside the tree:
+*.db
+*.sqlite
+coord-creds.toml

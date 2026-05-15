@@ -1,0 +1,10 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: 🔒 Security vulnerability
+    url: https://github.com/hiderun-tui/parseh/blob/main/SECURITY.md
+    about: Report security issues privately via SECURITY.md. Do NOT open a public issue.
+
+  - name: 💬 General questions
+    url: https://hiderun.com
+    about: For general project questions, visit hiderun.com.

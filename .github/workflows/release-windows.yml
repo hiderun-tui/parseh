@@ -1,0 +1,67 @@
+name: release-windows-portable
+
+# Builds the V0.1-alpha Windows portable ZIP (miner.exe + README + BATs +
+# example config) and attaches it to the GitHub Release.
+#
+# This complements .github/workflows/release.yml — that workflow ships raw
+# parseh-miner.exe per target with Sigstore cosign signatures. This one
+# ships the *gamer-friendly portable bundle* a non-technical volunteer can
+# unzip and double-click. To avoid double-signing the same archive we let
+# the bundle be signed by hand-off to release.yml's cosign step when both
+# workflows run on the same tag; the SHA-256 SUMS file is sufficient for
+# integrity verification on its own.
+
+on:
+  push:
+    tags:
+      - 'v0.1.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write   # reserved for future cosign step
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust target
+        run: rustup target add x86_64-pc-windows-gnu
+
+      - name: Install mingw-w64
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-mingw-w64 zip
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: server -> target
+          key: x86_64-pc-windows-gnu-portable
+
+      - name: Build Windows portable bundle
+        run: ./tools/release/windows/build.sh
+
+      - name: Compute SHA-256 sums
+        run: |
+          cd dist
+          sha256sum *.zip > SHA256SUMS
+          cat SHA256SUMS
+
+      - name: Upload bundle to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.zip
+            dist/SHA256SUMS
+
+      - name: Upload bundle as workflow artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: parseh-windows-portable
+          path: |
+            dist/*.zip
+            dist/SHA256SUMS

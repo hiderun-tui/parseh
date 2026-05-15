@@ -1,0 +1,4 @@
+# whisper.cpp binary + models installed by install-whisper.sh — symlinks
+# to $HOME/.parseh/stt/. Each developer installs locally.
+bin/
+models/

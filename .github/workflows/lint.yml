@@ -1,0 +1,45 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  markdown:
+    name: Markdown lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DavidAnson/markdownlint-cli2-action@v16
+        with:
+          globs: '**/*.md'
+
+  links:
+    name: Check links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --verbose --exclude-mail --exclude 'hiderun\.com' '**/*.md'
+          fail: true
+
+  eof:
+    name: Check end-of-file and whitespace
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check files end with newline
+        run: |
+          shopt -s globstar
+          fail=0
+          for f in **/*.md **/*.yml **/*.yaml **/*.json **/*.toml; do
+            [ -f "$f" ] || continue
+            if [ -n "$(tail -c 1 "$f")" ]; then
+              echo "::error file=$f::missing trailing newline"
+              fail=1
+            fi
+          done
+          exit $fail

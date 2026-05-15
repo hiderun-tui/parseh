@@ -1,0 +1,114 @@
+name: Bug report
+description: Report a bug in PARSEH
+title: "[BUG] "
+labels: ["type:bug", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > **Security issue?** Do NOT open it here. See [SECURITY.md](../../SECURITY.md) for the private disclosure process.
+        >
+        > Please do not include real names, emails, phone numbers, IPs, live credentials, private keys, seed phrases, or anything else that could compromise other users.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear description of what the bug is.
+      placeholder: When I run `parseh start`, the daemon panics after 3 seconds.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which part of PARSEH is affected?
+      options:
+        - chain
+        - server
+        - client
+        - sdk
+        - mesh
+        - website
+        - docs
+        - ci-cd
+        - other / unsure
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: To reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should have happened.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happened (logs, errors, screenshots — strip any PII first).
+    validations:
+      required: true
+
+  - type: input
+    id: env-os
+    attributes:
+      label: OS
+      placeholder: Ubuntu 24.04 / macOS 14.5 / Windows 11 / Android 14
+    validations:
+      required: true
+
+  - type: input
+    id: env-version
+    attributes:
+      label: Component version / commit SHA
+      placeholder: v0.1.0 or 1a8d7a5
+    validations:
+      required: true
+
+  - type: dropdown
+    id: env-network
+    attributes:
+      label: Network mode
+      options:
+        - Open
+        - Tunneled
+        - Throttled
+        - a national filter-only
+        - Mesh
+        - Unsure
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Anything else that might help.
+
+  - type: checkboxes
+    id: hygiene
+    attributes:
+      label: Pre-submit checks
+      options:
+        - label: I have removed all PII (names, emails, IPs, phone numbers) from this report.
+          required: true
+        - label: I have not included any live credentials, private keys, or seed phrases.
+          required: true
+        - label: This is not a security vulnerability (if it is, I will use SECURITY.md instead).
+          required: true

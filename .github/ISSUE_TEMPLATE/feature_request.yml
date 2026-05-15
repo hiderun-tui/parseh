@@ -1,0 +1,83 @@
+name: Feature request
+description: Suggest an idea for PARSEH
+title: "[FEATURE] "
+labels: ["type:feature", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing a feature. Please describe the *problem* first, then the proposed solution. A clear motivation makes it easier for the community to weigh in.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Briefly describe the feature in 1–3 sentences.
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: What problem does this solve? Who benefits?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How would this work? (Optional — happy to discuss.)
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches did you think about?
+
+  - type: textarea
+    id: security model
+    attributes:
+      label: security model impact
+      description: Does this feature add attack surface, change the security model, or affect user / operator safety?
+    validations:
+      required: true
+
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: Trade-offs
+      description: What does this cost? (latency, complexity, attack surface, performance, etc.)
+
+  - type: dropdown
+    id: roadmap
+    attributes:
+      label: Roadmap fit
+      description: Which release does this belong to?
+      options:
+        - V0.1 (pre-MVP)
+        - V1.0
+        - V1.5
+        - V2.0
+        - V3.0+
+        - Unsure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which subsystem is most affected?
+      options:
+        - chain
+        - server
+        - sdk
+        - client
+        - mesh
+        - website
+        - ci-cd
+        - cross-cutting / unsure
+    validations:
+      required: true

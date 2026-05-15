@@ -1,0 +1,37 @@
+[package]
+name        = "parseh-core"
+description = "Shared types, config, and keys for all PARSEH server-side crates."
+version     = { workspace = true }
+edition     = { workspace = true }
+license     = { workspace = true }
+authors     = { workspace = true }
+repository  = { workspace = true }
+
+[dependencies]
+anyhow    = { workspace = true }
+thiserror = { workspace = true }
+serde     = { workspace = true }
+serde_json = { workspace = true }
+tracing   = { workspace = true }
+
+# Peer capability registry. We pull libp2p through the workspace
+# umbrella crate (rather than libp2p-identity / libp2p-core directly)
+# so the PeerId and Multiaddr types are byte-identical to the ones the
+# miner publishes — version skew between sub-crates is a well-known
+# libp2p footgun.
+libp2p       = { workspace = true }
+parking_lot  = "0.12"
+
+# V0.2.5 — `PeerIdentity` carries an ed25519 verifying key sourced from
+# `parseh.caps.v1` advertisements. The dalek key is what `parseh-task`'s
+# `verify_signature` methods expect, so we mirror that dependency here.
+ed25519-dalek = { workspace = true }
+# V0.2.5 — `CapabilityAdvertisement` gains a wire-format-version bump
+# (1 → 2) and a fallback CBOR decoder so V0.2.1 nodes can still talk to
+# V0.2.5 nodes during the rolling upgrade window.
+ciborium     = { workspace = true }
+serde_bytes  = { workspace = true }
+
+[lib]
+name = "parseh_core"
+path = "src/lib.rs"

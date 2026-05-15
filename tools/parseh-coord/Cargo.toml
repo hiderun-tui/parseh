@@ -1,0 +1,35 @@
+[package]
+name = "parseh-coord"
+version = "0.1.0-alpha"
+edition = "2021"
+description = "Operator-driven community notification + messaging + issue-broadcast tool for PARSEH. Human-in-the-loop only; never an autonomous daemon."
+license = "Apache-2.0"
+repository = "https://github.com/hiderun-tui/parseh"
+publish = false
+
+# NOTE: This crate is deliberately NOT a member of the server/ network
+# workspace. It is operator tooling (like tools/parseh-mcp) and must not
+# touch the bootstrap-blocked network missions. It stands alone with its
+# own Cargo.toml and its own Cargo.lock.
+
+[[bin]]
+name = "parseh-coord"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+rusqlite = { version = "0.31", features = ["bundled"] }
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+dirs = "5"
+# Nostr connector. nostr-sdk is async; we wrap it in a private tokio
+# runtime so the synchronous `Connector` trait shape is preserved (the
+# rest of the crate is unchanged — no async leaks past nostr.rs).
+nostr-sdk = "=0.44.1"
+tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros", "time"] }
+
+[dev-dependencies]
+tempfile = "3"

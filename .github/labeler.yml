@@ -1,0 +1,45 @@
+# Path → label rules consumed by actions/labeler@v5.
+#
+# Each top-level key is a label name; the value is a list of glob patterns.
+# A PR gets a label if it touches *any* file matching *any* listed pattern.
+# Labels listed here must exist in .github/labels.yml.
+
+"area:chain":
+  - changed-files:
+      - any-glob-to-any-file: ["chain/**"]
+
+"area:server":
+  - changed-files:
+      - any-glob-to-any-file: ["server/**"]
+
+"area:sdk":
+  - changed-files:
+      - any-glob-to-any-file: ["sdk/**"]
+
+"area:client":
+  - changed-files:
+      - any-glob-to-any-file: ["client/**"]
+
+"area:mesh":
+  - changed-files:
+      - any-glob-to-any-file: ["mesh/**"]
+
+"area:website":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "hiderun-website/**"
+"area:ci-cd":
+  - changed-files:
+      - any-glob-to-any-file: [".github/**"]
+
+"type:docs":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.md"
+
+"type:translation":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.fa.md"
+          - "**/*.ar.md"
+          - "**/*.ku.md"

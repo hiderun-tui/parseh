@@ -1,0 +1,36 @@
+[package]
+name        = "parseh-tunnel"
+description = "PARSEH client-side SOCKS5 tunnel · exits via volunteer PARSEH peers with `has_external_internet: true`. V0.2.5 scaffold; hostile-network survivability NOT yet measured. No censorship-resistance claims until V0.2.5 measurement data exists."
+version     = { workspace = true }
+edition     = { workspace = true }
+license     = { workspace = true }
+authors     = { workspace = true }
+repository  = { workspace = true }
+
+[[bin]]
+name = "parseh-tunnel"
+path = "src/main.rs"
+
+[lib]
+name = "parseh_tunnel"
+path = "src/lib.rs"
+
+[dependencies]
+parseh-core = { path = "../core" }
+
+anyhow             = { workspace = true }
+thiserror          = { workspace = true }
+serde              = { workspace = true }
+serde_json         = { workspace = true }
+tokio              = { workspace = true, features = ["net", "io-util", "macros", "rt-multi-thread", "signal", "time"] }
+tracing            = { workspace = true }
+tracing-subscriber = { workspace = true }
+clap               = { workspace = true }
+libp2p             = { workspace = true }
+futures            = { workspace = true }
+ed25519-dalek      = { workspace = true }
+ciborium           = "0.2"
+rand               = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["full"] }

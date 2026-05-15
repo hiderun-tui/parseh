@@ -1,0 +1,47 @@
+[package]
+name        = "parseh-inference"
+description = "PARSEH inference host (llama.cpp- or Candle-backed LLM serving)."
+version     = { workspace = true }
+edition     = { workspace = true }
+license     = { workspace = true }
+authors     = { workspace = true }
+repository  = { workspace = true }
+
+[lib]
+name = "parseh_inference"
+path = "src/lib.rs"
+
+[[bin]]
+name = "parseh-inference"
+path = "src/main.rs"
+
+[features]
+default = []
+# V0.1: enables Candle-based runtime as the LLM fallback when Ollama is absent.
+# Adds ~50 MB of transitive deps so it is opt-in.
+candle  = ["dep:candle-core", "dep:candle-transformers", "dep:tokenizers", "dep:hf-hub"]
+
+[dependencies]
+parseh-core = { path = "../core" }
+
+anyhow             = { workspace = true }
+tokio              = { workspace = true }
+tracing            = { workspace = true }
+tracing-subscriber = { workspace = true }
+clap               = { workspace = true }
+serde              = { workspace = true }
+serde_json         = { workspace = true }
+
+# Candle-based pure-Rust LLM runtime — fallback when Ollama is unavailable.
+# Gated behind the `candle` feature; default builds remain small.
+candle-core         = { version = "0.7", optional = true }
+candle-transformers = { version = "0.7", optional = true }
+tokenizers          = { version = "0.20", optional = true, default-features = false, features = ["onig"] }
+hf-hub              = { version = "0.3", optional = true }
+
+# llama.cpp bindings will be enabled when the host integration lands.
+# Candidate crates: `llama-cpp-2`, `llm-chain-llama`, or `candle-core` (pure Rust).
+# Pinning deferred until the design is settled.
+
+[dev-dependencies]
+tempfile = "3"

@@ -1,0 +1,54 @@
+# sanitize-replacements.example.txt
+#
+# TEMPLATE — copy this file to the path expected by tools/sanitize-history.sh
+# (default: $HOME/.config/parseh/history-replacements.txt) and fill in your
+# actual values. The destination is in .gitignore and must never be committed.
+#
+# Format: one rule per line, blank lines and comments OK.
+#   literal-string-to-replace==>replacement-text
+#
+# Order matters — longer / more specific patterns first, so they win over the
+# generic ones below.
+
+# ─── Filesystem paths (replace with actual paths on your dev machine) ──────
+# Example shapes — these are placeholders, NOT real values.
+#
+#   /home/<your-username>/Projects/<this-repo-sibling>/==><sibling-repo>/
+#   /home/<your-username>/Projects/==><projects-root>/
+#   /Users/<your-username>/projects/==><projects-root>/
+#   C:\\Users\\<your-username>\\==><windows-projects-root>\\
+
+# ─── Prior project names that should not appear in public history ──────────
+# Example shape — replace with actual prior-project codenames:
+#
+#   <PriorProjectName>==>prior-project-A
+#   <AnotherPriorProject>==>prior-project-B
+
+# ─── Specific numeric / identifier strings (counts, IDs, etc.) ─────────────
+# Example shapes:
+#
+#   <some-specific-number>==>a-numeric-placeholder
+#   <specific-uuid-or-id>==><redacted-identifier>
+
+# ─── Account handles that pre-date this project ────────────────────────────
+# These are personal handles you've used on prior platforms that you want
+# stripped from any commit message or doc body. Example shapes:
+#
+#   <handle-1>==><redacted-handle-a>
+#   <handle-2>==><redacted-handle-b>
+#   <handle-3>==><redacted-handle-c>
+
+# ─── Hosting / infrastructure literals ─────────────────────────────────────
+# IP addresses, hostnames, system-user names. Example shapes:
+#
+#   <hosting-ip>==><redacted-hosting-ip>
+#   <system-user-name>==><redacted-system-user>
+#   <internal-domain>==><redacted-domain>
+
+# ─── Anything else fingerprint-able ────────────────────────────────────────
+# Email addresses that pre-date this project's noreply pattern, prior phone
+# numbers, real names of friends/colleagues that ended up in commit messages,
+# specific work-laptop hostnames, machine UUIDs, etc.
+#
+# Add one rule per literal you want gone. The script's --dry-run mode lets
+# you preview the rewrite before any destructive action.

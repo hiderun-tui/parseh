@@ -1,0 +1,29 @@
+[package]
+name        = "parseh-verify"
+version     = "0.1.0-dev"
+edition     = "2021"
+license     = "Apache-2.0"
+description = "V0.2 Primitive 2 — multi-peer verification primitive for the PARSEH coordination layer."
+
+[dependencies]
+anyhow        = { workspace = true }
+thiserror     = { workspace = true }
+serde         = { workspace = true }
+ciborium      = "0.2"
+sha2          = { workspace = true }
+hex           = { workspace = true }
+libp2p        = { workspace = true }
+ed25519-dalek = { workspace = true }
+rand          = { workspace = true }
+tokio         = { workspace = true }
+tracing       = { workspace = true }
+parking_lot   = "0.12"
+parseh-core   = { path = "../core" }
+parseh-task   = { path = "../parseh-task" }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt"] }
+
+[lib]
+name = "parseh_verify"
+path = "src/lib.rs"

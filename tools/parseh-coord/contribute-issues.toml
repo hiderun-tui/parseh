@@ -1,0 +1,237 @@
+# contribute-issues.toml — input for `parseh-coord broadcast-issues --file`
+#
+# Ready-to-use "help wanted" issue set drawn from the REAL current project
+#
+# Conservative-semantics rule applies to every line below: PARSEH is
+# v0.1.0-alpha; the network is NOT operational yet (zero bootstrap servers
+# provisioned). No issue overstates capability. Every open problem stays
+# open in writing. The project is pseudonymous-only — every issue ends with
+# a pseudonymous-contribution invite.
+#
+# Usage:
+#   parseh-coord broadcast-issues --file contribute-issues.toml --dry-run
+#   parseh-coord broadcast-issues --file contribute-issues.toml
+#
+# Requires PARSEH_COORD_GITHUB_TOKEN with write scope. Never silent/automatic.
+
+[[issues]]
+title = "help-wanted: provision the first PARSEH bootstrap server"
+labels = ["help-wanted", "infrastructure", "priority:critical"]
+body = """
+**Context.** PARSEH v0.1.0-alpha ships a working single-node miner and 245+
+passing tests, but **zero bootstrap servers are provisioned**, so no two
+nodes can discover each other on the real internet. The network does not
+form yet. This is the single load-bearing blocker for all three mission
+areas.
+
+**Why it matters.** Until at least one reachable bootstrap node with a
+stable public multiaddr exists, every component above the protocol layer is
+unexercised against the real internet. This is the highest-leverage action
+available to the project.
+
+**Honest current state.** The bootstrap mechanism is *designed*
+(the project docs: hardcoded multiaddr list, REALITY-wrapped
+bridge-leg entry, sanctions-aware geography). It is design-only — no server
+exists. Specs are small: 1 vCPU / 1 GB RAM / 10 GB disk.
+
+**First step.** Read the project docs. If you can operate a
+public-IP host in the EU, US, or a sanctions-permitted jurisdiction, comment
+with the jurisdiction (not the address) and which leg you can run. Note the
+trust model in that doc before volunteering.
+
+Contribute pseudonymously — no real name is required, asked for, or
+recorded. The maintainer is pseudonymous too.
+"""
+
+[[issues]]
+title = "help-wanted: stand up the 10-node public testnet (V0.2.5 exit gate)"
+labels = ["help-wanted", "testnet", "priority:high"]
+body = """
+**Context.** V0.2.5 hardening is ~85% done: fuzz (2.78M iters clean) and
+chaos (20/20, found 4 real protocol gaps) pass in-process. The remaining
+exit-gate item is a **10-node public testnet running ≥30 days** — currently
+BLOCKED on bootstrap provisioning.
+
+**Why it matters.** Every coordination primitive works in a test harness;
+none has met the real internet. A sustained multi-node testnet is what turns
+"passes tests" into "is a network", and it will surface bugs the in-process
+harnesses structurally cannot.
+
+**Honest current state.** Depends on the bootstrap-server issue landing
+first. The miner binary is EXECUTABLE today but single-node. No real
+multi-node deployment has ever run.
+
+**First step.** Track the bootstrap issue. Meanwhile, read
+the project docs (V0.2.5 exit gate) and propose a node-operator onboarding
+checklist + a minimal liveness-monitoring approach (no central telemetry —
+keep it consistent with the security model).
+
+Contribute pseudonymously — the project is pseudonymous-only.
+"""
+
+[[issues]]
+title = "help-wanted: wire the Nostr connector for parseh-coord"
+labels = ["help-wanted", "tooling", "good-first-issue"]
+body = """
+**Context.** `tools/parseh-coord` is the operator community-notification
+tool. Its GitHub connector is real; Matrix and Nostr are honest stubs that
+`bail!` with a clear message. Nostr is the **highest-priority next
+connector**.
+
+**Why it matters.** Nostr needs only a keypair — no account, no central
+server — which fits the project's pseudonymous-only, censorship-aware
+posture better than GitHub or Matrix. It gives the project a
+non-platform-dependent outreach channel.
+
+**Honest current state.** `src/connector.rs` defines the `Connector` trait
+and a `NostrConnector` stub. The trait is wired so a real impl is purely
+additive. Nothing is faked — `poll`/`post` currently return a clear error.
+Human-in-the-loop is a hard rule: any real connector must still go through
+the explicit draft → approve → send path; never auto-post.
+
+**First step.** Read `tools/parseh-coord/src/connector.rs` and
+`tools/parseh-coord/README.md`. Implement `poll()` (REQ subscription over a
+small relay set) and `post()` (kind-1 note / reply), reading the key from
+env / `~/.parseh/coord-creds.toml` only — never from the repo. Keep tests
+network-free.
+
+Contribute pseudonymously.
+"""
+
+[[issues]]
+title = "help-wanted: wire the Matrix connector for parseh-coord"
+labels = ["help-wanted", "tooling"]
+body = """
+**Context.** `tools/parseh-coord` has a `MatrixConnector` stub
+(`src/connector.rs`) that `bail!`s with a clear "not yet wired — V0.x"
+message. The trait is structured so a real implementation is additive.
+
+**Why it matters.** Matrix gives a moderated, room-based channel for
+contributor coordination distinct from GitHub. Lower priority than the
+Nostr connector but useful.
+
+**Honest current state.** Stub only. No fake data is returned. Credentials
+must come from env / `~/.parseh/coord-creds.toml`, never the repo. The
+human-in-the-loop rule (explicit approve before any send) is
+non-negotiable and must be preserved.
+
+**First step.** Read `tools/parseh-coord/src/connector.rs`. Implement
+`poll()` (sync/`/messages`) and `post()` (`/send`) against a homeserver,
+keeping all tests offline (no live homeserver in CI).
+
+Contribute pseudonymously — no real name required.
+"""
+
+[[issues]]
+title = "help-wanted: independent review of the Cosmos chain spec (V0.3, DEFERRED)"
+labels = ["help-wanted", "chain", "review"]
+body = """
+**Context.** The chain (`chain/`) is DESIGN-ONLY, ~3% complete — a spec in
+the project docs with a DEFERRED banner and zero Go code. It is
+correctly not being implemented yet: V0.2.5 hardening must clear on a real
+network first.
+
+**Why it matters.** Two open design problems are flagged in
+the project docs: (1) the
+reputation→chain oracle bridge is undesigned (how do signed attestations
+reach the chain without trusting one relayer?), and (2) the V0.2→V0.3
+reputation-purge requirement (V0.2 has no Sybil resistance, so the
+reputation graph at cutover is poisoned). Early review now saves months
+later.
+
+**Honest current state.** Spec only. No Cosmos SDK fork. No `x/parseh`
+module. No validators. No co-maintainers (a V0.3 prerequisite). This is
+months of work that has not started, by design.
+
+**First step.** Read the project docs and
+the project docs §2.4, then file review
+notes on the oracle-bridge and reputation-purge open problems. Do not open
+implementation PRs — review only at this phase.
+
+Contribute pseudonymously.
+"""
+
+[[issues]]
+title = "help-wanted: add fuzz / chaos targets for state-sync and quorum edges"
+labels = ["help-wanted", "testing", "security"]
+body = """
+**Context.** `parseh-fuzz` (7 targets, 2.78M iters clean) and
+`parseh-chaos` (4 scenarios, 20/20) already exist and have found 4 real
+protocol gaps. The chaos harness surfaced concrete weaknesses worth
+dedicated targets.
+
+**Why it matters.** The known findings — the 55.6% rubber-stamp compromise
+at M=5/N=9, `pick_executor` ignoring connectivity, and the
+JobResult↔JobVerification FK race — are exactly the class of bug that gets
+worse under real-network conditions. More adversarial coverage before the
+testnet is high-value.
+
+**Honest current state.** Existing harnesses prove things *in-process, not
+in deployment*. The state-sync protocol shipped (V0.2.5) with one
+regression test (`partition_recovery_converges_via_state_sync`); broader
+adversarial coverage of the since-timestamp pull path is open.
+
+**First step.** Read `server/parseh-chaos/README.md` (the 4 gaps) and add a
+chaos scenario exercising state-sync under repeated partition/heal cycles,
+or a fuzz target for the `outcomes_since` query path. Keep it deterministic
+and CI-friendly.
+
+Contribute pseudonymously.
+"""
+
+[[issues]]
+title = "help-wanted: native Persian review of docs + translations"
+labels = ["help-wanted", "translation", "good-first-issue"]
+body = """
+**Context.** Several PARSEH documents have AI-assisted Persian translations
+that need a native speaker to edit register, idiom, and
+technical-loanword choice: the README and other contributor-facing text, the
+FA press-kit files, and the website FAQ.
+
+**Why it matters.** PARSEH's primary users are on a restricted jurisdiction's censored national
+network. Honest, natural Persian is a safety property, not a nicety —
+mistranslating a security model caveat could mislead someone whose physical
+safety depends on understanding it correctly (the security model documents
+real legal risk under Article 286).
+
+**Honest current state.** Translations exist and are usable but are not
+native-reviewed. The conservative-semantics rule applies to the Persian
+exactly as to the English: no claim may be stronger in one language than
+the other.
+
+**First step.** Pick one file, open a translation-review issue (the
+template auto-applies `translation` + `help-wanted` + `good-first-issue`),
+and propose edits as a PR. Flag any place where the Persian implies more
+capability than the English — that is a bug, not a style choice.
+
+Contribute pseudonymously — no real name required, including yours.
+"""
+
+[[issues]]
+title = "help-wanted: measure REALITY stealth survivability on a hostile network"
+labels = ["help-wanted", "stealth-transport", "research"]
+body = """
+**Context.** PARSEH has a REALITY stealth-transport SCAFFOLD: subprocess
+wiring exists and needs `xray-core` installed, but **survivability against
+real DPI has never been measured**. Because of this, the project
+contractually does NOT claim "censorship-resistant" anywhere in
+user-facing copy.
+
+**Why it matters.** The whole point of the stealth transport is to survive
+a hostile national firewall. Until that is measured against a realistic
+adversary, the capability is unproven and the claim cannot be made. This is
+a cultural rule, enforced (the disclaimer is in 5 places).
+
+**Honest current state.** SCAFFOLD. Subprocess plumbing only. No
+measurement methodology has been executed. See
+the project docs (V0.2.5 measurement section) for the
+intended approach.
+
+**First step.** Read the project docs and
+the project docs. Propose a concrete, reproducible
+measurement methodology (test environment, DPI conditions, success metric,
+how a negative result gets reported honestly). Measurement design first;
+no premature claims.
+
+Contribute pseudonymously — the project is pseudonymous-only.
+"""

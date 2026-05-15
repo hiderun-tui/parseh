@@ -1,0 +1,218 @@
+name: Release
+
+# Cross-compiles parseh-miner for Windows / Linux / macOS on every tag
+# matching `v*` (e.g. v0.0.1, v0.1.0) and publishes the binaries as a
+# GitHub Release.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.target }} · build
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            archive: tar.gz
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            archive: tar.gz
+            cross: true
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            archive: zip
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
+            archive: zip
+            cross: true
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            archive: tar.gz
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            archive: tar.gz
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: server -> target
+          key: ${{ matrix.target }}
+
+      - name: install cross-compile linker (linux aarch64)
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+          echo "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc" >> "$GITHUB_ENV"
+
+      - name: cargo build --release
+        working-directory: server
+        run: cargo build --release --bin parseh-miner --target ${{ matrix.target }}
+
+      - name: package (unix)
+        if: matrix.archive == 'tar.gz'
+        shell: bash
+        run: |
+          cd server/target/${{ matrix.target }}/release
+          chmod +x parseh-miner
+          tar -czf "../../../../parseh-miner-${{ github.ref_name }}-${{ matrix.target }}.tar.gz" parseh-miner
+          cd ../../../..
+          sha256sum "parseh-miner-${{ github.ref_name }}-${{ matrix.target }}.tar.gz" \
+            > "parseh-miner-${{ github.ref_name }}-${{ matrix.target }}.tar.gz.sha256"
+
+      - name: package (windows)
+        if: matrix.archive == 'zip'
+        shell: pwsh
+        run: |
+          cd server/target/${{ matrix.target }}/release
+          Compress-Archive -Path parseh-miner.exe -DestinationPath "..\..\..\..\parseh-miner-${{ github.ref_name }}-${{ matrix.target }}.zip"
+          cd ..\..\..\..
+          (Get-FileHash -Algorithm SHA256 "parseh-miner-${{ github.ref_name }}-${{ matrix.target }}.zip").Hash + "  parseh-miner-${{ github.ref_name }}-${{ matrix.target }}.zip" `
+            | Set-Content "parseh-miner-${{ github.ref_name }}-${{ matrix.target }}.zip.sha256"
+
+      - name: install cosign
+        uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: 'v2.4.1'
+
+      - name: sign archive (unix)
+        if: matrix.archive == 'tar.gz'
+        shell: bash
+        env:
+          COSIGN_YES: "true"
+        run: |
+          archive="parseh-miner-${{ github.ref_name }}-${{ matrix.target }}.tar.gz"
+          cosign sign-blob --yes \
+            --bundle "${archive}.cosign.bundle" \
+            "${archive}"
+
+      - name: sign archive (windows)
+        if: matrix.archive == 'zip'
+        shell: bash
+        env:
+          COSIGN_YES: "true"
+        run: |
+          archive="parseh-miner-${{ github.ref_name }}-${{ matrix.target }}.zip"
+          cosign sign-blob --yes \
+            --bundle "${archive}.cosign.bundle" \
+            "${archive}"
+
+      - name: upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: parseh-miner-${{ matrix.target }}
+          path: parseh-miner-*${{ matrix.target }}*
+
+  release:
+    name: publish release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+      - name: flatten artifacts
+        run: |
+          mkdir -p out
+          find dist -type f \( -name '*.tar.gz' -o -name '*.zip' -o -name '*.sha256' -o -name '*.cosign.bundle' \) -exec cp {} out/ \;
+          ls -la out/
+
+      - name: write release notes
+        run: |
+          cat > out/NOTES.md <<EOF
+          # parseh-miner ${{ github.ref_name }}
+
+          Autonomous PARSEH service-providing node (relay + inference).
+
+          ## Downloads
+
+          | Platform | Architecture | Archive |
+          |---|---|---|
+          | Windows | x86_64 | parseh-miner-${{ github.ref_name }}-x86_64-pc-windows-msvc.zip |
+          | Windows | arm64 | parseh-miner-${{ github.ref_name }}-aarch64-pc-windows-msvc.zip |
+          | Linux | x86_64 | parseh-miner-${{ github.ref_name }}-x86_64-unknown-linux-gnu.tar.gz |
+          | Linux | arm64 | parseh-miner-${{ github.ref_name }}-aarch64-unknown-linux-gnu.tar.gz |
+          | macOS | Intel | parseh-miner-${{ github.ref_name }}-x86_64-apple-darwin.tar.gz |
+          | macOS | Apple Silicon | parseh-miner-${{ github.ref_name }}-aarch64-apple-darwin.tar.gz |
+
+          Each archive ships with a \`.sha256\` checksum and a
+          \`.cosign.bundle\` Sigstore signature (keyless, GitHub OIDC).
+
+          ## Verifying the download
+
+          \`\`\`bash
+          # Linux / macOS
+          sha256sum --check parseh-miner-${{ github.ref_name }}-*.sha256
+
+          # Windows (PowerShell)
+          Get-FileHash parseh-miner-${{ github.ref_name }}-*.zip
+          \`\`\`
+
+          ## Verifying the Sigstore signature
+
+          Install cosign (https://docs.sigstore.dev/cosign/installation/),
+          then for each archive verify the bundle was produced by this
+          repository's \`release.yml\` workflow:
+
+          \`\`\`bash
+          cosign verify-blob \\
+            --bundle parseh-miner-${{ github.ref_name }}-<target>.<ext>.cosign.bundle \\
+            --certificate-identity-regexp 'https://github\\.com/hiderun-tui/parseh/\\.github/workflows/release\\.yml@.+' \\
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \\
+            parseh-miner-${{ github.ref_name }}-<target>.<ext>
+          \`\`\`
+
+          A successful verification prints \`Verified OK\`. Only binaries
+          produced by this repository's \`release.yml\` workflow can pass
+          this check — a third party cannot forge the signature.
+
+          ## What's in the box
+
+          A single self-contained executable that you run from a terminal:
+
+          \`\`\`bash
+          parseh-miner init
+          parseh-miner start
+          \`\`\`
+
+          The first run generates your ed25519 identity at the OS-conventional
+          config dir (Windows: %APPDATA%\\parseh\\, Linux: ~/.config/parseh/,
+          macOS: ~/Library/Application Support/parseh/). **Back it up** — it
+          is your earning identity on the PARSEH network.
+
+          See [server/miner/README.md](https://github.com/hiderun-tui/parseh/blob/main/server/miner/README.md)
+          for the full command reference and configuration.
+
+          ## Security
+
+          Releases are signed keylessly with Sigstore via GitHub OIDC.
+          Verify both the SHA-256 checksum and the \`.cosign.bundle\`
+          signature before running. See
+          [SECURITY.md](https://github.com/hiderun-tui/parseh/blob/main/SECURITY.md#verifying-release-binaries-with-cosign)
+          for the canonical verification recipe.
+          EOF
+
+      - name: gh release create
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "parseh-miner ${{ github.ref_name }}" \
+            --notes-file out/NOTES.md \
+            out/*.tar.gz out/*.zip out/*.sha256 out/*.cosign.bundle

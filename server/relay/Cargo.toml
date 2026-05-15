@@ -1,0 +1,45 @@
+[package]
+name        = "parseh-relay"
+description = "PARSEH stealth-transport relay node (libp2p)."
+version     = { workspace = true }
+edition     = { workspace = true }
+license     = { workspace = true }
+authors     = { workspace = true }
+repository  = { workspace = true }
+
+[[bin]]
+name = "parseh-relay"
+path = "src/main.rs"
+
+[features]
+# When enabled, the relay can spawn a forked `xray-core` subprocess to wrap
+# outbound traffic in REALITY-over-TLS. V0.2.1 scaffold quality — see
+# the project notes for what's stubbed vs real.
+default = []
+reality = []
+
+[[example]]
+name              = "reality_smoke"
+path              = "examples/reality_smoke.rs"
+required-features = ["reality"]
+
+[dependencies]
+parseh-core = { path = "../core" }
+
+anyhow             = { workspace = true }
+thiserror          = { workspace = true }
+# Workspace tokio is the baseline. Reality scaffold (subprocess + SOCKS5
+# loopback dial) additionally needs `process`, `sync`, and `net` features;
+# adding them here is additive — other crates that depend on the workspace
+# tokio still get the same minimum set.
+tokio              = { workspace = true, features = ["process", "sync", "net"] }
+tracing            = { workspace = true }
+tracing-subscriber = { workspace = true }
+clap               = { workspace = true }
+libp2p             = { workspace = true }
+futures            = { workspace = true }
+serde              = { workspace = true }
+serde_json         = { workspace = true }
+toml               = { workspace = true }
+dirs               = { workspace = true }
+rand               = { workspace = true }

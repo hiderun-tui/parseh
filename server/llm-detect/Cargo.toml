@@ -1,0 +1,26 @@
+[package]
+name        = "parseh-llm-detect"
+description = "Detect installed LLM runtimes (Ollama, llama.cpp, GGUF files) for the PARSEH miner."
+version     = { workspace = true }
+edition     = { workspace = true }
+license     = { workspace = true }
+authors     = { workspace = true }
+repository  = { workspace = true }
+
+[dependencies]
+anyhow     = { workspace = true }
+serde      = { workspace = true }
+serde_json = { workspace = true }
+# We need `process` (spawn nvidia-smi/wmic) and `time` (timeouts) on top of
+# the workspace-default tokio features.
+tokio      = { version = "1.36", features = ["macros", "rt-multi-thread", "process", "time", "io-util", "fs"] }
+tracing    = { workspace = true }
+dirs       = { workspace = true }
+reqwest    = { workspace = true }
+which      = "7"
+walkdir    = "2"
+
+[dev-dependencies]
+tokio    = { version = "1", features = ["macros", "rt", "rt-multi-thread", "process", "time"] }
+wiremock = "0.6"
+tempfile = "3"

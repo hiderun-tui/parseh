@@ -1,0 +1,43 @@
+# PARSEH miner configuration — example
+#
+# Copy this file to %APPDATA%\parseh\miner.toml on Windows
+# (or ~/.config/parseh/miner.toml on Linux, ~/Library/Application Support/parseh/miner.toml on macOS)
+# and edit to taste. Restart parseh-miner.exe after each change.
+#
+# Schema lives in server/miner/src/config.rs in the source tree.
+
+# Display name shown to other peers via the libp2p Identify protocol.
+# Not signed, not authoritative — just for humans reading peer lists.
+moniker = "my-windows-rig"
+
+# PARSEH chain RPC endpoint. Used by the wallet to query balance and submit
+# txs. Override to a self-hosted node if you don't trust the public endpoint.
+chain_rpc = "https://rpc.parseh.network"
+
+# Bootstrap peers (libp2p multiaddrs). Empty list = wait for inbound dials
+# only, which won't work behind a NAT — fill in at least one seed for the
+# alpha network.
+bootstrap = [
+  # "/dns/seed.parseh.network/tcp/8421/p2p/12D3KooW...",
+]
+
+[capabilities]
+# Route encrypted traffic on behalf of users behind a national filter.
+# Costs only bandwidth — safe to leave on.
+relay = true
+
+# Serve LLM inference jobs. Requires a GPU; the capability is auto-disabled
+# at runtime if gpu_memory_mb == 0. Leave false if you only want to relay.
+inference = false
+
+# Self-reported VRAM in MB. Lying inflates your perceived capacity but the
+# on-chain audit (redundant execution + slashing) catches the lie.
+gpu_memory_mb = 0
+
+# Models you can serve. Tags must match the model registry, e.g.
+# ["qwen2.5:7b", "llama-3.1:8b", "tinyllama:1.1b"].
+model_tags = []
+
+# Your uplink in megabits per second. Used by the router to size relay
+# jobs sent your way. Set this honestly — too high and you'll drop jobs.
+uplink_mbps = 50

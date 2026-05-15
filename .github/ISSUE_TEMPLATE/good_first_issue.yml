@@ -1,0 +1,106 @@
+name: Good first issue
+description: Propose a self-contained piece of work that a new contributor can pick up
+title: "[good-first-issue] "
+labels: ["good-first-issue", "help-wanted", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Good-first-issues should be small, well-scoped, and self-contained. Most are 2–8 hours of work for a first-time contributor.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What the contributor will do
+      description: One paragraph in plain English.
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters
+      description: Briefly say how this fits the project.
+    validations:
+      required: true
+
+  - type: textarea
+    id: files
+    attributes:
+      label: Files to touch
+      description: List the files and what's there / what to add.
+      placeholder: |
+        - `path/to/file.rs` — what's already there
+        - `path/to/new/file.rs` — what to add
+    validations:
+      required: true
+
+  - type: textarea
+    id: approach
+    attributes:
+      label: Suggested approach
+      description: Bullet points. Don't be prescriptive about implementation details — leave room for the contributor to bring judgment.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+
+  - type: textarea
+    id: skills-required
+    attributes:
+      label: Skills required
+      description: Be honest. "Comfortable reading Rust + understands async basics" is better than "expert in libp2p".
+    validations:
+      required: true
+
+  - type: textarea
+    id: skills-not-required
+    attributes:
+      label: Skills NOT required
+      description: Important — most good-first-issues do NOT need all the project's skills. Reassure newcomers.
+      value: |
+        - Cryptography expertise
+        - Cosmos SDK knowledge
+        - Existing PARSEH contributor network
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      value: |
+        - [ ] Compiles (`cargo build --workspace` from the relevant directory)
+        - [ ] CI passes (security + build + lint)
+        - [ ] Includes a test that would catch a regression
+        - [ ] DCO-signed commit (`git commit -s`)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: effort
+    attributes:
+      label: Estimated effort (hours)
+      options:
+        - "1–2"
+        - "2–4"
+        - "4–8"
+        - "8–16"
+        - "More than 16 (consider re-scoping)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - chain
+        - server
+        - sdk
+        - client
+        - mesh
+        - website
+        - ci-cd
+        - docs
+        - cross-cutting
+    validations:
+      required: true
