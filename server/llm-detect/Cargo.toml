@@ -17,7 +17,7 @@ tokio      = { version = "1.36", features = ["macros", "rt-multi-thread", "proce
 tracing    = { workspace = true }
 dirs       = { workspace = true }
 reqwest    = { workspace = true }
-which      = "7"
+which      = "8"
 walkdir    = "2"
 
 [dev-dependencies]
