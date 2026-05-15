@@ -1,10 +1,12 @@
 module github.com/hiderun-tui/parseh/chain
 
-go 1.21
+go 1.23.0
+
+require github.com/spf13/cobra v1.8.0
 
 require (
-	github.com/spf13/cobra v1.8.0
-	github.com/spf13/viper v1.18.2
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/spf13/pflag v1.0.10 // indirect
 )
 
 // Real Cosmos SDK dependencies will be added when the chain is fleshed out.
