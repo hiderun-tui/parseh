@@ -58,7 +58,7 @@ libp2p      = { version = "0.53", features = ["tokio", "tcp", "noise", "yamux", 
 futures     = "0.3"
 async-trait = "0.1"
 dirs        = "5.0"
-toml        = "0.8"
+toml        = "1.1"
 bytes       = "1.5"
 hex         = "0.4"
 sha2        = "0.10"
