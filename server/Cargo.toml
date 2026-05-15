@@ -54,7 +54,7 @@ tokio       = { version = "1.36", features = ["macros", "rt-multi-thread", "sign
 tracing     = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
 clap        = { version = "4.5", features = ["derive"] }
-libp2p      = { version = "0.53", features = ["tokio", "tcp", "noise", "yamux", "ping", "identify", "kad", "gossipsub", "request-response", "macros", "cbor", "serde"] }
+libp2p      = { version = "0.56", features = ["tokio", "tcp", "noise", "yamux", "ping", "identify", "kad", "gossipsub", "request-response", "macros", "cbor", "serde"] }
 futures     = "0.3"
 async-trait = "0.1"
 dirs        = "5.0"
