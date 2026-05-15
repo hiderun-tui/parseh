@@ -60,7 +60,7 @@ zeroize     = { version = "1", features = ["zeroize_derive"] }
 # SOCKS5 listener for the Hiderun browser tunnel (loopback only, V0).
 # See server/miner/src/proxy.rs for context. tokio-stream is required
 # for the `incoming().next().await` accept loop used by Socks5Server.
-fast-socks5  = "0.10"
+fast-socks5  = "1.0"
 tokio-stream = "0.1"
 
 [dev-dependencies]
