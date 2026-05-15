@@ -65,7 +65,7 @@ sha2        = "0.10"
 rand        = "0.8"
 ed25519-dalek = { version = "2.1", features = ["serde", "rand_core"] }
 semver      = "1.0"
-reqwest     = { version = "0.11", features = ["json", "rustls-tls"], default-features = false }
+reqwest     = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
 # V0.2.5 — LRU cap on the open-quorums map in `parseh-miner`. Closes the
 # V0.2.1 residual where an attacker could OOM a node by publishing N
 # distinct JobResults. Pinned at 0.12; the `put` / `pop_lru` surface
