@@ -23,7 +23,7 @@ jobs:
     name: gitleaks · secret scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0   # full history so historical leaks are caught
       - uses: gitleaks/gitleaks-action@v2
@@ -40,9 +40,9 @@ jobs:
       matrix:
         workspace: [server, sdk]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
-      - uses: rustsec/audit-check@v1
+      - uses: rustsec/audit-check@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           working-directory: ${{ matrix.workspace }}
@@ -52,8 +52,8 @@ jobs:
     name: govulncheck · chain
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
         with:
           go-version: '1.21'
       - name: install govulncheck
@@ -69,11 +69,11 @@ jobs:
     name: pnpm audit · client/hiderun
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
         with:
           version: 9
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
       - name: pnpm audit
@@ -91,13 +91,13 @@ jobs:
       matrix:
         language: [rust, javascript-typescript, go]
     steps:
-      - uses: actions/checkout@v4
-      - uses: github/codeql-action/init@v3
+      - uses: actions/checkout@v6
+      - uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
-      - uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/autobuild@v4
+      - uses: github/codeql-action/analyze@v4
         with:
           category: '/language:${{ matrix.language }}'
 
@@ -112,7 +112,7 @@ jobs:
       matrix:
         workspace: [server, sdk]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - name: install cargo-deny
         run: cargo install cargo-deny --locked
