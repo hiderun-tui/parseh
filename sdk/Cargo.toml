@@ -1,0 +1,24 @@
+# PARSEH SDK workspace.
+# Two crates today:
+#   - core/     cross-platform Rust core that powers Hiderun (Tauri + Android JNI + iOS FFI).
+#               Exposes its interface via UniFFI so we generate Kotlin & Swift bindings for free.
+#   - merchant/ merchant-facing helper crate (invoicing, QR/NFC primitives). Spec for V2.
+
+[workspace]
+resolver = "2"
+members  = ["core", "merchant"]
+
+[workspace.package]
+version      = "0.1.0-dev"
+edition      = "2021"
+rust-version = "1.75"
+license      = "Apache-2.0"
+authors      = ["PARSEH contributors"]
+repository   = "https://github.com/hiderun-tui/parseh"
+
+[workspace.dependencies]
+anyhow    = "1.0"
+thiserror = "1.0"
+serde     = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+uniffi    = { version = "0.27", features = ["build", "cli"] }

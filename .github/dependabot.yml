@@ -1,0 +1,66 @@
+version: 2
+
+# Dependabot keeps the dependency surface fresh so security checks
+# don't go stale. Each ecosystem polls weekly; PRs come grouped to
+# keep noise low.
+
+updates:
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      ci-actions:
+        patterns: ["*"]
+
+  # Rust — server workspace
+  - package-ecosystem: cargo
+    directory: /server
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    groups:
+      rust-deps:
+        update-types: [minor, patch]
+
+  # Rust — sdk workspace
+  - package-ecosystem: cargo
+    directory: /sdk
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    groups:
+      rust-deps:
+        update-types: [minor, patch]
+
+  # Rust — client/hiderun/src-tauri
+  - package-ecosystem: cargo
+    directory: /client/hiderun/src-tauri
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+
+  # Go — chain
+  - package-ecosystem: gomod
+    directory: /chain
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+
+  # npm — client/hiderun
+  - package-ecosystem: npm
+    directory: /client/hiderun
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      npm-deps:
+        update-types: [minor, patch]

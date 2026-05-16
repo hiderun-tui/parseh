@@ -1,0 +1,23 @@
+[package]
+name        = "parseh-sdk"
+description = "Cross-platform PARSEH core. Powers the Hiderun desktop and mobile clients."
+version     = { workspace = true }
+edition     = { workspace = true }
+license     = { workspace = true }
+authors     = { workspace = true }
+repository  = { workspace = true }
+
+[lib]
+name       = "parseh_sdk"
+crate-type = ["lib", "cdylib", "staticlib"]
+path       = "src/lib.rs"
+
+[dependencies]
+anyhow    = { workspace = true }
+thiserror = { workspace = true }
+serde     = { workspace = true }
+serde_json = { workspace = true }
+uniffi    = { workspace = true }
+
+[build-dependencies]
+uniffi = { workspace = true }

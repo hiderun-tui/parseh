@@ -1,0 +1,38 @@
+[package]
+name = "parseh-integration-tests"
+version = "0.1.0-dev"
+edition = "2021"
+license = "Apache-2.0"
+description = "V0.2.5 multi-node integration tests (5-node mesh, peer identity, executor self-selection, M-of-N quorum)."
+publish = false
+
+[lib]
+name = "parseh_integration_tests"
+path = "src/lib.rs"
+
+[dependencies]
+anyhow              = { workspace = true }
+thiserror           = { workspace = true }
+serde               = { workspace = true }
+tokio               = { workspace = true, features = ["full"] }
+tracing             = { workspace = true }
+tracing-subscriber  = { workspace = true }
+parking_lot         = "0.12"
+ed25519-dalek       = { workspace = true }
+sha2                = { workspace = true }
+hex                 = { workspace = true }
+libp2p              = { workspace = true }
+futures             = { workspace = true }
+rand                = { workspace = true }
+ciborium            = { workspace = true }
+lru                 = { workspace = true }
+
+parseh-core         = { path = "../core" }
+parseh-task         = { path = "../parseh-task" }
+parseh-verify       = { path = "../parseh-verify" }
+parseh-shared-state = { path = "../parseh-shared-state" }
+tempfile            = "3"
+
+[dev-dependencies]
+tokio              = { workspace = true, features = ["full"] }
+tracing-subscriber = { workspace = true }

@@ -1,0 +1,137 @@
+name: Security
+
+# Runs on every push, every PR, and every day at 03:14 UTC.
+# Five independent checks; any failure blocks merge to main.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '14 3 * * *'   # daily scheduled scan catches new CVEs in pinned deps
+
+permissions:
+  contents: read
+  security-events: write   # required for CodeQL + SARIF uploads
+
+jobs:
+  # ─── 1. Secret scanning (gitleaks) ──────────────────────────────────────
+  # Scans the full git history on every push for credentials, API keys,
+  # personal email addresses, and project-specific banned strings.
+  secrets:
+    name: gitleaks · secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history so historical leaks are caught
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Configuration lives in .gitleaks.toml (this repo's root).
+
+  # ─── 2. Rust dependency audit ───────────────────────────────────────────
+  cargo-audit:
+    name: cargo audit · server + sdk
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        workspace: [server, sdk]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: rustsec/audit-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          working-directory: ${{ matrix.workspace }}
+
+  # ─── 3. Go dependency vulnerability scan ────────────────────────────────
+  go-vuln:
+    name: govulncheck · chain
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+      - name: install govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@latest
+      - name: govulncheck
+        working-directory: chain
+        run: |
+          go mod tidy
+          govulncheck ./...
+
+  # ─── 4. npm / pnpm audit ────────────────────────────────────────────────
+  npm-audit:
+    name: pnpm audit · client/hiderun
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: pnpm audit
+        working-directory: client/hiderun
+        run: |
+          pnpm install --lockfile-only || pnpm install
+          pnpm audit --prod --audit-level=high
+
+  # ─── 5. CodeQL — SAST for Rust + JavaScript/TypeScript + Go ─────────────
+  codeql:
+    name: CodeQL · ${{ matrix.language }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [rust, javascript-typescript, go]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+      - uses: github/codeql-action/analyze@v3
+        with:
+          category: '/language:${{ matrix.language }}'
+
+  # ─── 6. License compliance ──────────────────────────────────────────────
+  # Walks the dep tree of each workspace and flags non-permissive licenses.
+  # PARSEH ships under Apache-2.0; we only want compatible deps.
+  license-check:
+    name: license check · server + sdk
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        workspace: [server, sdk]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: install cargo-deny
+        run: cargo install cargo-deny --locked
+      - name: cargo deny check
+        working-directory: ${{ matrix.workspace }}
+        run: cargo deny --all-features check licenses bans sources advisories
+
+  # ─── 7. Final summary ────────────────────────────────────────────────────
+  # Single status check the branch-protection rule can require.
+  security-summary:
+    name: security checks summary
+    runs-on: ubuntu-latest
+    needs: [secrets, cargo-audit, go-vuln, npm-audit, codeql, license-check]
+    if: always()
+    steps:
+      - name: verify all upstream jobs passed
+        run: |
+          if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
+            echo "::error::one or more security checks failed"
+            exit 1
+          fi
+          echo "all security checks green"

@@ -1,0 +1,12 @@
+# libFuzzer writes mutated inputs into `corpus/<target>/` as it runs,
+# naming each file by its SHA-1 (40 lowercase hex chars). Those files
+# are local fuzzing state, not source: they vary per machine and per
+# run, and replaying them gains us nothing the deterministic seeds in
+# `gen/gen_corpus.rs` don't already cover.
+#
+# Strategy: ignore the 40-hex-char names libFuzzer produces, but keep
+# every file with a descriptive name (e.g. `inference_minimal`).
+# Anything committed must therefore have a human-chosen name.
+
+# Match a basename of exactly 40 hex characters (libFuzzer's SHA-1).
+[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]

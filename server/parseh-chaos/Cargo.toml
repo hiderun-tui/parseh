@@ -1,0 +1,46 @@
+[package]
+name        = "parseh-chaos"
+version     = "0.1.0-dev"
+edition     = "2021"
+license     = "Apache-2.0"
+description = "V0.2.5 adversarial test harness — partition / malicious-verifier / Sybil / corruption scenarios. In-process only. ADVERSARIAL TESTING, NOT EXPLOIT DEVELOPMENT."
+publish     = false
+
+[lib]
+name = "parseh_chaos"
+path = "src/lib.rs"
+
+# ── cultural rule ───────────────────────────────────────────────────────
+# This crate exists to harden V0.2 against adversarial reality. Every
+# scenario runs entirely in-process over `MemoryTransport`. There is no
+# network-side adversarial code and no facility to target external IPs.
+# When a test FAILS, that signals a real V0.2 protocol bug — fix the
+# protocol, not the test. See `README.md` for the full rule.
+# ────────────────────────────────────────────────────────────────────────
+
+[dependencies]
+anyhow              = { workspace = true }
+thiserror           = { workspace = true }
+serde               = { workspace = true }
+tokio               = { workspace = true, features = ["full"] }
+tracing             = { workspace = true }
+tracing-subscriber  = { workspace = true }
+parking_lot         = "0.12"
+ed25519-dalek       = { workspace = true }
+sha2                = { workspace = true }
+hex                 = { workspace = true }
+libp2p              = { workspace = true }
+futures             = { workspace = true }
+rand                = { workspace = true }
+ciborium            = { workspace = true }
+lru                 = { workspace = true }
+
+parseh-core         = { path = "../core" }
+parseh-task         = { path = "../parseh-task" }
+parseh-verify       = { path = "../parseh-verify" }
+parseh-shared-state = { path = "../parseh-shared-state" }
+tempfile            = "3"
+
+[dev-dependencies]
+tokio              = { workspace = true, features = ["full"] }
+tracing-subscriber = { workspace = true }

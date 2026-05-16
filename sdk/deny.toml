@@ -1,0 +1,37 @@
+# cargo-deny configuration · sdk workspace
+# Identical policy to server/deny.toml. Kept as separate file because
+# cargo-deny operates per-workspace.
+
+[graph]
+targets = [
+  { triple = "x86_64-unknown-linux-gnu" },
+  { triple = "x86_64-pc-windows-msvc" },
+  { triple = "x86_64-apple-darwin" },
+  { triple = "aarch64-apple-darwin" },
+  { triple = "aarch64-unknown-linux-gnu" },
+  { triple = "aarch64-linux-android" },
+  { triple = "aarch64-apple-ios" },
+]
+
+[licenses]
+allow = [
+  "MIT", "Apache-2.0", "Apache-2.0 WITH LLVM-exception",
+  "BSD-2-Clause", "BSD-3-Clause", "ISC",
+  "Unicode-DFS-2016", "Unicode-3.0", "Zlib", "CC0-1.0",
+  "MPL-2.0", "OpenSSL", "BSL-1.0",
+]
+confidence-threshold = 0.8
+
+[advisories]
+db-path = "~/.cargo/advisory-db"
+db-urls = ["https://github.com/rustsec/advisory-db"]
+yanked  = "deny"
+
+[bans]
+multiple-versions = "warn"
+wildcards         = "deny"
+
+[sources]
+unknown-registry = "deny"
+unknown-git      = "warn"
+allow-registry   = ["https://github.com/rust-lang/crates.io-index"]

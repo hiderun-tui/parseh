@@ -1,0 +1,22 @@
+[package]
+name        = "parseh-wallet"
+description = "PARSEH on-chain wallet — signing keys, balance queries, tx submission."
+version     = { workspace = true }
+edition     = { workspace = true }
+license     = { workspace = true }
+authors     = { workspace = true }
+repository  = { workspace = true }
+
+[dependencies]
+parseh-core = { path = "../core" }
+
+anyhow        = { workspace = true }
+thiserror     = { workspace = true }
+serde         = { workspace = true }
+tracing       = { workspace = true }
+ed25519-dalek = { workspace = true }
+rand          = { workspace = true }
+bech32        = "0.11"
+
+# Real Cosmos-SDK-compatible client crate to be picked once the chain
+# is producing blocks (candidates: `cosmrs`, `tendermint-rs`).

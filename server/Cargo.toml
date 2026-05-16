@@ -1,0 +1,84 @@
+# PARSEH server-side workspace.
+# Each crate is one piece of the node:
+#   - core/        shared types, config, keys
+#   - relay/       libp2p stealth-transport relay
+#   - inference/   llama.cpp host for distributed LLM serving
+#   - wallet/      PARSEH chain client (sign + submit txs)
+#   - platforms/   OS-specific helpers (systemd, Windows service, launchctl)
+#   - llm-detect/  detect installed LLM runtimes (Ollama, llama.cpp, GGUF, GPU)
+
+[workspace]
+resolver = "2"
+members  = [
+  "core",
+  "inference",
+  "llm-detect",
+  "llm-downloader",
+  "miner",
+  "parseh-agent-runtime",
+  "parseh-agent-spec",
+  "parseh-chaos",
+  "parseh-cli",
+  "parseh-integration-tests",
+  "parseh-shared-state",
+  "parseh-task",
+  "parseh-testnet",
+  "parseh-tunnel",
+  "parseh-verify",
+  "platforms",
+  "relay",
+  "wallet",
+]
+# cargo-fuzz convention: keep the fuzz harness out of the production
+# workspace so the libFuzzer runtime / sanitizer flags don't leak into
+# the lockfile or feature-unification graph. See
+# `parseh-fuzz/README.md` for the rationale.
+exclude  = [ "parseh-fuzz" ]
+
+[workspace.package]
+version      = "0.1.0-dev"
+edition      = "2021"
+rust-version = "1.75"
+license      = "Apache-2.0"
+authors      = ["PARSEH contributors"]
+repository   = "https://github.com/hiderun-tui/parseh"
+readme       = "../README.md"
+
+[workspace.dependencies]
+# pinned cross-crate dependencies
+anyhow      = "1.0"
+thiserror   = "1.0"
+serde       = { version = "1.0", features = ["derive"] }
+serde_json  = "1.0"
+tokio       = { version = "1.36", features = ["macros", "rt-multi-thread", "signal", "io-util", "time"] }
+tracing     = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+clap        = { version = "4.5", features = ["derive"] }
+libp2p      = { version = "0.53", features = ["tokio", "tcp", "noise", "yamux", "ping", "identify", "kad", "gossipsub", "request-response", "macros", "cbor", "serde"] }
+futures     = "0.3"
+async-trait = "0.1"
+dirs        = "5.0"
+toml        = "0.8"
+bytes       = "1.5"
+hex         = "0.4"
+sha2        = "0.10"
+rand        = "0.8"
+ed25519-dalek = { version = "2.1", features = ["serde", "rand_core"] }
+semver      = "1.0"
+reqwest     = { version = "0.11", features = ["json", "rustls-tls"], default-features = false }
+# V0.2.5 — LRU cap on the open-quorums map in `parseh-miner`. Closes the
+# V0.2.1 residual where an attacker could OOM a node by publishing N
+# distinct JobResults. Pinned at 0.12; the `put` / `pop_lru` surface
+# this project consumes is stable in that minor.
+lru         = "0.12"
+# V0.2.5 — CBOR roundtrip in `parseh-core` for the wire-format-version
+# bump (1 → 2) of `CapabilityAdvertisement`. Workspace-pinned so the
+# `parseh-task` crate's ciborium version stays byte-identical.
+ciborium    = "0.2"
+serde_bytes = "0.11"
+
+[profile.release]
+opt-level     = 3
+lto           = "thin"
+codegen-units = 1
+strip         = true

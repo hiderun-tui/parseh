@@ -1,0 +1,70 @@
+[package]
+name        = "parseh-miner"
+description = "PARSEH miner — autonomous service-providing node (relay + inference)."
+version     = { workspace = true }
+edition     = { workspace = true }
+license     = { workspace = true }
+authors     = { workspace = true }
+repository  = { workspace = true }
+
+[[bin]]
+name = "parseh-miner"
+path = "src/main.rs"
+
+[features]
+default = []
+canary-executor = []
+
+[dependencies]
+parseh-core            = { path = "../core" }
+parseh-llm-detect      = { path = "../llm-detect" }
+parseh-llm-downloader  = { path = "../llm-downloader" }
+parseh-task            = { path = "../parseh-task" }
+parseh-verify          = { path = "../parseh-verify" }
+parseh-shared-state    = { path = "../parseh-shared-state" }
+
+anyhow             = { workspace = true }
+thiserror          = { workspace = true }
+tokio              = { workspace = true }
+tracing            = { workspace = true }
+tracing-subscriber = { workspace = true }
+clap               = { workspace = true }
+libp2p             = { workspace = true }
+futures            = { workspace = true }
+async-trait        = { workspace = true }
+serde              = { workspace = true }
+serde_json         = { workspace = true }
+toml               = { workspace = true }
+dirs               = { workspace = true }
+bytes              = { workspace = true }
+hex                = { workspace = true }
+sha2               = { workspace = true }
+rand               = { workspace = true }
+ed25519-dalek      = { workspace = true }
+semver             = { workspace = true }
+reqwest            = { workspace = true }
+
+# V0.2 plumbing: CBOR for `parseh.tasks.v1` / `parseh.verify.v1` /
+# `parseh.state-deltas.v1` envelopes. parseh-task already re-exports
+# `to_cbor_bytes` / `from_cbor_bytes`, but we keep ciborium here for the
+# tag-byte multiplexing logic in `handle_swarm_event`.
+ciborium    = "0.2"
+parking_lot = "0.12"
+
+# V0.2.5 — LRU cap on the open-quorums map. Closes the V0.2.1 residual
+# where an attacker publishing N distinct JobResults could OOM a target
+# node (`HashMap<ContentHash, OpenQuorum>` was unbounded).
+lru         = { workspace = true }
+zeroize     = { version = "1", features = ["zeroize_derive"] }
+
+# SOCKS5 listener for the Hiderun browser tunnel (loopback only, V0).
+# See server/miner/src/proxy.rs for context. tokio-stream is required
+# for the `incoming().next().await` accept loop used by Socks5Server.
+fast-socks5  = "0.10"
+tokio-stream = "0.1"
+
+[dev-dependencies]
+# Integration tests in `tests/integration_v0_2.rs` spawn the miner as a
+# subprocess and inspect the SQLite shared-state DB directly.
+tempfile = "3"
+tokio    = { workspace = true, features = ["macros", "rt-multi-thread", "time", "process"] }

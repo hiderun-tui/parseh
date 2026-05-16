@@ -1,0 +1,52 @@
+name: OpenSSF Scorecard
+
+# Runs the OpenSSF Scorecard analysis once a week and on every push to
+# main. Produces a Scorecard badge value + uploads SARIF so issues
+# surface in the Security tab.
+#
+# IMPORTANT: Scorecard's `publish_results: true` mode requires the
+# repository to be PUBLIC. The job is guarded with an `if:` clause so
+# it skips cleanly while the repo is private during staging, then
+# starts running automatically the day visibility flips to public.
+
+on:
+  schedule:
+    - cron: '17 4 * * 1'   # 04:17 UTC every Monday
+  push:
+    branches: [main]
+
+permissions:
+  read-all: true
+
+jobs:
+  analysis:
+    name: scorecard analysis
+    # Skip on private repos — Scorecard's publishing step doesn't work
+    # there and will fail the workflow.
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write   # SARIF upload
+      id-token: write          # OIDC for some Scorecard checks
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: ossf/scorecard-action@v2
+        with:
+          results_file: results.sarif
+          results_format: sarif
+          publish_results: true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scorecard-results-${{ github.run_id }}
+          path: results.sarif
+          retention-days: 30
+
+      - uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif

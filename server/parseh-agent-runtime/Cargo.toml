@@ -1,0 +1,31 @@
+[package]
+name = "parseh-agent-runtime"
+version = "0.1.0-dev"
+edition = "2021"
+license = "Apache-2.0"
+description = "Executor for signed agent + workflow definitions. Pillar-1 runtime: turns an AgentDefinition into LLM-backed work with schema-validated I/O and a signed JobResult."
+
+[dependencies]
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+ciborium = { workspace = true }
+tokio = { workspace = true }
+reqwest = { workspace = true }
+tracing = { workspace = true }
+libp2p = { workspace = true }
+ed25519-dalek = { workspace = true }
+sha2 = { workspace = true }
+async-trait = { workspace = true }
+dirs = { workspace = true }
+parseh-core = { path = "../core" }
+parseh-task = { path = "../parseh-task" }
+parseh-agent-spec = { path = "../parseh-agent-spec" }
+parseh-llm-detect = { path = "../llm-detect" }
+
+[dev-dependencies]
+tokio = { workspace = true }
+async-trait = { workspace = true }
+wiremock = "0.6"
+tempfile = "3"

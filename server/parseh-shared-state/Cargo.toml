@@ -1,0 +1,52 @@
+[package]
+name        = "parseh-shared-state"
+version     = "0.1.0-dev"
+edition     = "2021"
+license     = "Apache-2.0"
+description = "V0.2 Primitive 3 — SQLCipher-encrypted shared state with signed gossipsub delta propagation."
+
+[dependencies]
+anyhow        = { workspace = true }
+thiserror     = { workspace = true }
+serde         = { workspace = true }
+serde_bytes   = "0.11"
+ciborium      = "0.2"
+sha2          = { workspace = true }
+hex           = { workspace = true }
+libp2p        = { workspace = true }
+ed25519-dalek = { workspace = true }
+# rusqlite is gated on a feature flag (default: `encrypted`, which pulls
+# `bundled-sqlcipher-vendored-openssl`). Document tradeoffs in README.
+rusqlite      = { version = "0.32", default-features = false }
+argon2        = "0.5"
+zeroize       = { version = "1", features = ["zeroize_derive"] }
+parking_lot   = "0.12"
+tracing       = { workspace = true }
+chrono        = { version = "0.4", default-features = false, features = ["clock"] }
+parseh-core   = { path = "../core" }
+parseh-task   = { path = "../parseh-task" }
+parseh-verify = { path = "../parseh-verify" }
+
+[dev-dependencies]
+tokio     = { workspace = true, features = ["macros", "rt"] }
+tempfile  = "3"
+rand      = { workspace = true }
+
+[features]
+# Default: ship without encryption-at-rest for V0.2 dev to keep compile
+# times tolerable on the CI matrix. `bundled-sqlcipher-vendored-openssl`
+# would add ~3-5 min to a clean build because it compiles SQLCipher +
+# OpenSSL from source. The API surface (KeyMaterial, KeySource) is fully
+# implemented either way; with `encrypted` off the key is computed and
+# applied as a no-op PRAGMA-checked dance that exercises the code path
+# but does not actually encrypt the file.
+#
+# To enable real at-rest encryption:
+#   cargo build -p parseh-shared-state --features encrypted
+default   = ["bundled"]
+bundled   = ["rusqlite/bundled"]
+encrypted = ["rusqlite/bundled-sqlcipher-vendored-openssl"]
+
+[lib]
+name = "parseh_shared_state"
+path = "src/lib.rs"

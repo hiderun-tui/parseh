@@ -1,0 +1,83 @@
+# Build artifacts
+target/
+build/
+dist/
+out/
+bin/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Rust
+**/*.rs.bk
+# Cargo.lock IS committed for binary crates (server/, client/hiderun/src-tauri/)
+# to give contributors reproducible builds. Library-only workspaces (sdk/)
+# benefit less but it's harmless to include.
+
+# Go
+/vendor/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Mobile
+*.apk
+*.aab
+*.ipa
+*.xcuserstate
+DerivedData/
+
+# Secrets — never commit these
+.env
+.env.local
+*.key
+*.pem
+keystore.jks
+GoogleService-Info.plist
+google-services.json
+
+# Local-only gitleaks supplement with project-specific deny patterns.
+# Shared with co-maintainers out-of-band, never committed.
+.gitleaks-private.toml
+
+# Local-only replacement-rule file for tools/sanitize-history.sh.
+# The maintainer fills this in from tools/sanitize-replacements.example.txt
+# with the literal strings to scrub from git history. NEVER commit it.
+tools/sanitize-replacements.txt
+.config/parseh/history-replacements.txt
+
+# PARSEH runtime data
+data/
+db/
+*.sqlite
+models/
+chain-data/
+
+# parseh-coord local operator state + credentials.
+# These normally live in ~/.parseh/ (OUTSIDE the repo). This guards against
+# a stray copy if someone runs parseh-coord with --db pointing into the tree.
+.parseh/
+coord.db
+coord-creds.toml
+
+# Local agent/runtime state — never commit
+.claude/

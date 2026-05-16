@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+title: PARSEH
+message: >-
+  If you cite this project in research, please use the metadata below.
+type: software
+authors:
+  - given-names: The PARSEH contributors
+    website: 'https://hiderun.com'
+license: Apache-2.0
+repository-code: 'https://github.com/hiderun-tui/parseh'
+url: 'https://hiderun.com'
+abstract: >-
+  An open-source research project: a peer-to-peer network in which
+  contributor machines run local LLM inference and verify each other's
+  work by M-of-N consensus. v0.1.0-alpha engineering preview.
+keywords:
+  - decentralized-network
+  - humanitarian
+  - peer-to-peer
+  - libp2p
+  - cosmos-sdk
+  - LLM-inference
+preferred-citation:
+  type: software
+  title: 'PARSEH: peer-verified distributed LLM inference (alpha)'
+  authors:
+    - given-names: The PARSEH contributors
+  url: 'https://github.com/hiderun-tui/parseh'
+  license: Apache-2.0

@@ -1,0 +1,31 @@
+[package]
+name        = "hiderun"
+description = "Hiderun desktop client (Tauri shell wrapping the PARSEH SDK)."
+version     = "0.1.0-dev"
+edition     = "2021"
+license     = "Apache-2.0"
+authors     = ["PARSEH contributors"]
+repository  = "https://github.com/hiderun-tui/parseh"
+default-run = "hiderun"
+
+[lib]
+name       = "hiderun_lib"
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.0", features = [] }
+
+[dependencies]
+tauri      = { version = "2.0", features = [] }
+serde      = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow     = "1.0"
+tracing    = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+
+# Cross-platform Rust core shared with the Android + iOS clients.
+parseh-sdk = { path = "../../../sdk/core", package = "parseh-sdk" }
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

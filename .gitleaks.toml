@@ -1,0 +1,67 @@
+# gitleaks configuration for the PARSEH project.
+#
+# This file is committed and therefore PUBLIC. It must not enumerate
+# the specific strings (legacy handles, hosting IPs, system users) that
+# it's defending against — listing those would itself be a leak.
+#
+# Project-specific deny patterns (the exact values that must never
+# reappear) live in `.gitleaks-private.toml`, which is in `.gitignore`
+# and shared with maintainers out-of-band. The pre-commit hook reads
+# BOTH files locally; the public CI workflow only reads this one and
+# leans on gitleaks' default ruleset + the generic guards below.
+
+[extend]
+# Inherit the upstream default ruleset (AWS, Stripe, GitHub PATs,
+# Slack tokens, generic high-entropy strings, RSA/EC private keys, etc.).
+useDefault = true
+
+# ─── Generic deny patterns (safe to publish) ────────────────────────────────
+# These describe the SHAPE of a leak rather than naming any specific value.
+
+[[rules]]
+id          = "parseh-env-var-with-string-literal"
+description = "Sensitive-named env vars assigned a literal in source (must be env-only)"
+regex       = '''(?i)(FTP|SMTP|DB|DATABASE|SQL|API|TOKEN|SECRET|PASSWORD|PASS|KEY)_?(PASS|USER|HOST|TOKEN|SECRET|KEY|URL|URI)\s*=\s*['"][^'"$][^'"]*['"]'''
+tags        = ["secret", "env-literal"]
+
+[[rules]]
+id          = "parseh-square-token-shape"
+description = "Square Pay credential shape — guard even though project doesn't use Square"
+regex       = '''(?i)SQUARE_(?:ACCESS_TOKEN|APP_ID|LOCATION_ID)\s*[:=]\s*['"][A-Za-z0-9_-]{8,}['"]'''
+tags        = ["secret"]
+
+[[rules]]
+id          = "parseh-third-party-llm-api-key-names"
+description = "Common LLM/SaaS API-key environment-variable names with literal values"
+regex       = '''(?i)(ANTHROPIC|OPENAI|GEMINI|MISTRAL|COHERE|TWILIO_(?:ACCOUNT_SID|AUTH_TOKEN)|SUPABASE_SERVICE_ROLE|TELEGRAM_MANAGER_CHAT_ID)[A-Z_]*\s*=\s*['"][^'"$][^'"]*['"]'''
+tags        = ["secret", "llm-saas"]
+
+# ─── Allowlists (false-positive suppression) ────────────────────────────────
+
+[allowlist]
+description = "Allow placeholders, example values, and noreply emails"
+regexes = [
+  # GitHub noreply email pattern (used in commit Co-Authored-By trailers)
+  '''[0-9]+\+[a-zA-Z0-9_-]+@users\.noreply\.github\.com''',
+  # Cloudflare DNS in docs ("try 1.1.1.1 to detect open internet")
+  '''\b1\.1\.1\.1\b''',
+  # Example IPs reserved by RFC 5737
+  '''\b(?:192\.0\.2\.|198\.51\.100\.|203\.0\.113\.)\d{1,3}\b''',
+  # libp2p example PeerIDs in docs always start with 12D3KooW…
+  '''12D3KooW[A-Za-z0-9]{40,52}''',
+  # Bech32 example addresses in docs
+  '''parseh1[a-z0-9]{38,58}''',
+  # Generic "your-X-here" placeholders
+  '''(?i)<your-[a-z-]+>''',
+  '''(?i)REPLACE_WITH_[A-Z_]+''',
+  # The literal noreply email used by hiderun-tui in Co-Authored-By
+  '''284127627\+hiderun-tui@users\.noreply\.github\.com''',
+]
+paths = [
+  '''(.*?)(\.git/.*?)''',
+  '''(.*?)(node_modules/.*?)''',
+  '''(.*?)(target/.*?)''',
+  '''(.*?)\.lock$''',
+  '''(.*?)/CHANGELOG\.md$''',
+  '''(.*?)\.gitleaks-private\.toml$''',
+]

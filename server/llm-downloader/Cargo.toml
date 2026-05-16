@@ -1,0 +1,34 @@
+[package]
+name        = "parseh-llm-downloader"
+description = "Consent-gated LLM model downloader for the PARSEH miner."
+version     = { workspace = true }
+edition     = { workspace = true }
+license     = { workspace = true }
+authors     = { workspace = true }
+repository  = { workspace = true }
+
+[lib]
+name = "parseh_llm_downloader"
+path = "src/lib.rs"
+
+# Note on dependencies:
+# - reqwest is pinned to 0.12 here (the workspace pin is 0.11) because we
+#   need `stream` + `rustls-tls` and want the futures-0.3 / hyper-1.x stack.
+#   The crate is leaf-level so the divergence is isolated. When the workspace
+#   bumps reqwest to 0.12 this entry can switch to `{ workspace = true }`
+#   with the extra features.
+# - `dirs` and `sha2` mirror the workspace pins so the resolver shares them.
+[dependencies]
+anyhow        = { workspace = true }
+serde         = { workspace = true }
+sha2          = { workspace = true }
+tokio         = { version = "1", features = ["full"] }
+reqwest       = { version = "0.12", default-features = false, features = ["stream", "rustls-tls"] }
+futures-util  = "0.3"
+tracing       = { workspace = true }
+dirs          = { workspace = true }
+
+[dev-dependencies]
+tokio    = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }
+wiremock = "0.6"
+tempfile = "3"

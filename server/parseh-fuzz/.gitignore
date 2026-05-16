@@ -1,0 +1,5 @@
+# cargo-fuzz emits crash artifacts here. Local fuzzing state — never
+# committed. Reproduce findings by sharing the minimised input
+# instead (see README §Crash artifact analysis).
+artifacts/
+coverage/

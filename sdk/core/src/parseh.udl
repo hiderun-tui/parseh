@@ -1,0 +1,45 @@
+// PARSEH cross-platform SDK interface.
+//
+// This .udl file is the source of truth for what the Hiderun
+// desktop (Tauri/Rust) and mobile (Kotlin via JNI / Swift via FFI)
+// clients can call. UniFFI generates the per-language bindings.
+
+namespace parseh_sdk {
+    /// SDK version string (e.g. "0.1.0-dev").
+    string sdk_version();
+
+    /// Returns a default config blob (JSON) the client can persist and edit.
+    string default_client_config();
+};
+
+/// Connection states reported by the SDK to the UI.
+enum ConnectionState {
+    "Disconnected",
+    "Connecting",
+    "Connected",
+    "Reconnecting",
+    "Failed",
+};
+
+/// Lightweight network status the UI polls.
+dictionary NetworkStatus {
+    ConnectionState state;
+    u32 peers;
+    u64 bytes_in;
+    u64 bytes_out;
+    string? last_error;
+};
+
+interface Client {
+    /// Create a Client from a JSON config blob (matches default_client_config()).
+    constructor(string config_json);
+
+    /// Begin connecting to the PARSEH network. Non-blocking.
+    void connect();
+
+    /// Stop the network worker and release resources.
+    void disconnect();
+
+    /// Current connection status snapshot.
+    NetworkStatus status();
+};

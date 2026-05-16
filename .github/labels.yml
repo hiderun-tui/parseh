@@ -1,0 +1,151 @@
+# PARSEH label definitions.
+#
+# This is the single source of truth for labels in the repo. Apply with:
+#
+#   gh label create -f .github/labels.yml
+#
+# (or use https://github.com/marketplace/actions/github-labeler with this file
+# as input — see .github/labels-readme.md).
+#
+# Re-run after editing. `gh label create` is idempotent for new labels;
+# use `gh label edit` for colour/description changes or pass `--force` per
+# the labeler action.
+
+# ---------------------------------------------------------------------------
+# Status labels — exactly one should be applied to an issue/PR at a time.
+# ---------------------------------------------------------------------------
+- name: "status:triage"
+  color: "ededed"
+  description: "Needs initial review by a maintainer."
+
+- name: "status:accepted"
+  color: "0e8a16"
+  description: "Maintainers have confirmed this should be worked on."
+
+- name: "status:in-progress"
+  color: "fbca04"
+  description: "A contributor has claimed this and is actively working on it."
+
+- name: "status:in-review"
+  color: "1d76db"
+  description: "A PR is open for this and is in review."
+
+- name: "status:blocked"
+  color: "b60205"
+  description: "Waiting on something external (decision, upstream, etc.)."
+
+- name: "status:done"
+  color: "0e8a16"
+  description: "Shipped / closed as completed."
+
+- name: "status:wontfix"
+  color: "666666"
+  description: "Closed without action by design."
+
+# ---------------------------------------------------------------------------
+# Type labels — what kind of work is this?
+# ---------------------------------------------------------------------------
+- name: "type:bug"
+  color: "d73a4a"
+  description: "Something is broken."
+
+- name: "type:feature"
+  color: "a2eeef"
+  description: "New functionality."
+
+- name: "type:research"
+  color: "7057ff"
+  description: "Investigation / measurement / literature review."
+
+- name: "type:network-ops"
+  color: "0e8a16"
+  description: "Real-world infrastructure: bridges, validators, satellite, mesh."
+
+- name: "type:docs"
+  color: "0075ca"
+  description: "Documentation only."
+
+- name: "type:translation"
+  color: "fef2c0"
+  description: "Translation of existing content (Persian, Arabic, Kurdish, …)."
+
+- name: "type:security"
+  color: "b60205"
+  description: "Security-relevant. Coordinate via SECURITY.md if non-public."
+
+- name: "type:payment-vote"
+  color: "fbca04"
+  description: "Proposal to pay a contributor for completed merged work."
+
+# ---------------------------------------------------------------------------
+# Area labels — which subsystem? Map to CODEOWNERS paths.
+# ---------------------------------------------------------------------------
+- name: "area:chain"
+  color: "5319e7"
+  description: "Cosmos-SDK chain / consensus."
+
+- name: "area:server"
+  color: "1d76db"
+  description: "Server / miner / wallet daemon."
+
+- name: "area:sdk"
+  color: "0052cc"
+  description: "Cross-platform SDK (UniFFI)."
+
+- name: "area:client"
+  color: "cccccc"
+  description: "End-user clients (desktop, mobile, web)."
+
+- name: "area:mesh"
+  color: "c5def5"
+  description: "Mesh / a national filter / offline routing."
+
+- name: "area:website"
+  color: "fef2c0"
+  description: "hiderun.com and project docs site."
+
+- name: "area:ci-cd"
+  color: "666666"
+  description: "Build, release, GitHub Actions, supply chain."
+
+# ---------------------------------------------------------------------------
+# Priority labels.
+# ---------------------------------------------------------------------------
+- name: "priority:p0-ship-blocker"
+  color: "b60205"
+  description: "Blocks the next release. Drop other work."
+
+- name: "priority:p1-high"
+  color: "fb6e1e"
+  description: "Should land in the next release."
+
+- name: "priority:p2-medium"
+  color: "fbca04"
+  description: "Important, no immediate deadline."
+
+- name: "priority:p3-low"
+  color: "0e8a16"
+  description: "Nice to have."
+
+# ---------------------------------------------------------------------------
+# Contributor flags.
+# ---------------------------------------------------------------------------
+- name: "good-first-issue"
+  color: "7057ff"
+  description: "Scoped and friendly for a new contributor."
+
+- name: "help-wanted"
+  color: "159818"
+  description: "Maintainers actively want help with this."
+
+- name: "awaiting-community-approval"
+  color: "fbca04"
+  description: "Open for community 👍 / 👎 vote (72 hours)."
+
+- name: "awaiting-maintainer-approval"
+  color: "fbca04"
+  description: "Community vote complete; awaiting maintainer sign-off."
+
+- name: "payment-vote"
+  color: "fbca04"
+  description: "Alias applied by the payment_vote issue form."

@@ -1,0 +1,42 @@
+[package]
+name        = "parseh-agent-spec"
+version     = "0.1.0-dev"
+edition     = "2021"
+license     = "Apache-2.0"
+description = "Signed, content-addressable agent-definition schema (prompt + RAG knowledge refs + exact input/output JSON Schemas + lineage) for the PARSEH V0.2 contribution layer. Schema + types only — execution, quality scoring, and economic mechanics are deferred."
+
+# Scope note (binding): NO marketplace, investment, trading, or quality-weighted
+# economic logic in this crate. See `src/lib.rs` and the design doc
+# (the project notes) for the rationale and the
+# maintainer-note threshold gate that blocks those V0.3+ features.
+
+[dependencies]
+anyhow        = { workspace = true }
+thiserror     = { workspace = true }
+serde         = { workspace = true }
+serde_bytes   = "0.11"           # binary-friendly CBOR for signatures
+ciborium      = "0.2"            # canonical CBOR crate
+sha2          = { workspace = true }
+hex           = { workspace = true }
+libp2p        = { workspace = true }  # PeerId with serde feature (workspace-level)
+ed25519-dalek = { workspace = true }
+rand          = { workspace = true }
+serde_json    = { workspace = true }  # the JSON Schema documents we embed
+regex         = "1.10"           # SPDX-identifier shape check + simple metadata validation
+# JSON Schema validation. `default-features = false` drops `resolve-http` /
+# `resolve-file` / TLS — schema-by-reference (`$ref` to remote URLs or local
+# files) is intentionally NOT supported here. Agent authors MUST inline their
+# schemas; remote `$ref` would (a) re-introduce a network dependency in a leaf
+# schema crate, (b) make content-addressing hash-unstable across nodes that
+# fetch different remote schema versions, and (c) leak fetch metadata. The
+# Persian-contributor consideration (mirroring) is documented in the design
+# doc.
+jsonschema    = { version = "0.46", default-features = false }
+parseh-task   = { path = "../parseh-task" }  # ContentHash reuse
+
+[dev-dependencies]
+serde_json = { workspace = true }
+
+[lib]
+name = "parseh_agent_spec"
+path = "src/lib.rs"
