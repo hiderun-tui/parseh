@@ -17,7 +17,7 @@ libp2p        = { workspace = true }
 ed25519-dalek = { workspace = true }
 # rusqlite is gated on a feature flag (default: `encrypted`, which pulls
 # `bundled-sqlcipher-vendored-openssl`). Document tradeoffs in README.
-rusqlite      = { version = "0.32", default-features = false }
+rusqlite      = { version = "0.39", default-features = false }
 argon2        = "0.5"
 zeroize       = { version = "1", features = ["zeroize_derive"] }
 parking_lot   = "0.12"
